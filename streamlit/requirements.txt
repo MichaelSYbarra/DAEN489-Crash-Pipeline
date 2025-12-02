@@ -1,0 +1,14 @@
+streamlit
+reportlab
+pika
+minio
+duckdb
+pandas
+matplotlib
+seaborn
+docker
+uuid
+joblib
+scikit-learn
+prometheus_client==0.20.0
+werkzeug
