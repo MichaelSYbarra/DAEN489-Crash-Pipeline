@@ -2,14 +2,12 @@ import streamlit as st
 import datetime
 
 import streamlit as st
-from prometheus_client import make_wsgi_app, Gauge, Summary
-from werkzeug.middleware.dispatcher import DispatcherMiddleware
-from streamlit.web.server.server import Server
+from prometheus_client import Gauge, Summary, start_http_server
 
-# --- PATCH STREAMLIT WITH PROMETHEUS ---
-prom_app = make_wsgi_app()
-st_server = Server.get_current()
-st_server._wsgi_app = DispatcherMiddleware(st_server._wsgi_app, {"/metrics": prom_app})
+
+
+start_http_server(9102)
+
 
 # --- DEFINE METRICS ---
 # Initialize Prometheus metrics in session_state if not already
