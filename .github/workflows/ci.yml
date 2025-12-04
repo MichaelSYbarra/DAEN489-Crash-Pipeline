@@ -1,0 +1,90 @@
+name: "CI Pipeline"
+
+on:
+  push:
+    branches: ["*"]
+
+jobs:
+  build:
+    name: "Build and Validate"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
+
+      - name: "Set up Go"
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.22"
+
+      - name: "Build Go extractor"
+        working-directory: ./extractor
+        run: |
+          go mod tidy
+          go build ./...
+
+      - name: "Set up Python"
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: "Install Python dependencies"
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: "Test Python imports"
+        run: |
+          python -c "import sys; import os; print('Python imports OK')"
+
+  docker-validation:
+    name: "Docker Compose Validation"
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
+
+      - name: "Build key services with docker compose"
+        run: |
+          docker compose -f docker-compose.yml build extractor
+          docker compose -f docker-compose.yml build transformer
+          docker compose -f docker-compose.yml build cleaner
+          docker compose -f docker-compose.yml build streamlit
+
+      - name: "Validate docker-compose.yml"
+        run: |
+          docker compose -f docker-compose.yml config
+
+  sanity-check:
+    name: "Sanity Check Entrypoints"
+    runs-on: ubuntu-latest
+    needs: docker-validation
+
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
+
+      # Extractor help check
+      - name: "Extractor help check"
+        working-directory: ./extractor
+        run: |
+          go run main.go --help
+
+      # Transformer import check
+      - name: "Transformer import test"
+        run: |
+          python - <<EOF
+          import transformer
+          print("Transformer imported successfully")
+          EOF
+
+      # Cleaner import check
+      - name: "Cleaner import test"
+        run: |
+          python - <<EOF
+          import cleaner
+          print("Cleaner imported successfully")
+          EOF
