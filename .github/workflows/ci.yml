@@ -71,25 +71,15 @@ jobs:
         - name: "Checkout repository"
           uses: actions/checkout@v4
 
-        # Start MinIO service for Go extractor
-        - name: "Start MinIO service"
+        # Start all required services in the background
+        - name: "Start key Docker services"
           run: |
-            docker compose -f docker-compose.yaml up -d minio
+            docker compose -f docker-compose.yaml up -d minio extractor transformer cleaner
 
-        # Wait for MinIO to be ready
-        - name: "Wait for MinIO readiness"
-          run: |
-            echo "Waiting for MinIO to be ready..."
-            until nc -z minio 9000; do
-            sleep 2
-            done
-            echo "MinIO is ready"
-
-        # Extractor help check
+        # Extractor help check inside Docker network
         - name: "Extractor help check"
-          working-directory: ./extractor
           run: |
-            go run main.go --help
+            docker compose -f docker-compose.yaml run --rm extractor go run main.go --help
 
         # Transformer import check
         - name: "Transformer import test"
@@ -106,3 +96,8 @@ jobs:
             import cleaner
             print("Cleaner imported successfully")
             EOF
+
+        # Stop services after sanity checks
+        - name: "Stop Docker services"
+          run: |
+            docker compose -f docker-compose.yml down
