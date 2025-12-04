@@ -104,4 +104,4 @@ jobs:
         # Stop services after sanity checks
         - name: "Stop Docker services"
           run: |
-            docker compose -f docker-compose.yml down
+            docker compose -f docker-compose.yaml down
