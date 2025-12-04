@@ -71,6 +71,10 @@ jobs:
         - name: "Checkout repository"
           uses: actions/checkout@v4
 
+        - name: "Setup environment file"
+          run: |
+            cp .env.sample .env
+
         # Start all required services in the background
         - name: "Start key Docker services"
           run: |
