@@ -68,27 +68,41 @@ jobs:
     needs: docker-validation
 
     steps:
-      - name: "Checkout repository"
-        uses: actions/checkout@v4
+        - name: "Checkout repository"
+          uses: actions/checkout@v4
 
-      # Extractor help check
-      - name: "Extractor help check"
-        working-directory: ./extractor
-        run: |
-          go run main.go --help
+        # Start MinIO service for Go extractor
+        - name: "Start MinIO service"
+          run: |
+            docker compose -f docker-compose.yml up -d minio
 
-      # Transformer import check
-      - name: "Transformer import test"
-        run: |
-          python - <<EOF
-          import transformer
-          print("Transformer imported successfully")
-          EOF
+        # Wait for MinIO to be ready
+        - name: "Wait for MinIO readiness"
+          run: |
+            echo "Waiting for MinIO to be ready..."
+            until nc -z minio 9000; do
+            sleep 2
+            done
+            echo "MinIO is ready"
 
-      # Cleaner import check
-      - name: "Cleaner import test"
-        run: |
-          python - <<EOF
-          import cleaner
-          print("Cleaner imported successfully")
-          EOF
+        # Extractor help check
+        - name: "Extractor help check"
+          working-directory: ./extractor
+          run: |
+            go run main.go --help
+
+        # Transformer import check
+        - name: "Transformer import test"
+          run: |
+            python - <<EOF
+            import transformer
+            print("Transformer imported successfully")
+            EOF
+
+        # Cleaner import check
+        - name: "Cleaner import test"
+          run: |
+            python - <<EOF
+            import cleaner
+            print("Cleaner imported successfully")
+            EOF
