@@ -132,3 +132,58 @@ This project touched on a great many different parts of devloping a full machine
 ### Room for Improvement
 * More detailed metrics  
 * Cleaning up the streamlit interface slight usage annoyances
+
+## Azure Setup
+The migration of the project to a remote virtual machine encountered few roadblocks past Azure allowing the creation of the machine. The azure virtual machine was created to have a similar enviroment to that of the local ubuntu virtual machine. The same Ubuntu version was used along with pulling the lastest version of Docker.  
+
+### Ports
+The following ports were opened to allow access to the same localhosted services:  
+```
+Streamlit:
+8501:8501  
+
+Grafana:
+3000:3000  
+
+Prometheus:
+9090:9090  
+
+MinIO:
+9000:9001
+```  
+  
+### Folder Structure
+The folder structure of the remote setup remain identical to the local machine's folder structure for the project:  
+```
+├── cleaner
+├── data
+│   └── gold
+├── duckdb_exporter
+├── extractor
+├── grafana_data
+├── minio-data
+│   ├── raw-data
+│   └── transform-data
+├── monitoring
+├── prometheus_data
+├── readme-assets
+├── streamlit
+│   ├── artifacts
+│   ├── pages
+│   └── utils
+└── transformer
+```  
+
+### Azure Examples
+The following screenshots display the pipeline successfully running two full pipeline backfill tasks on the Azure virtual machine. The first screenshot shows the data management page after the first run showing data in both the gold table and the MinIO datalake. The second screenshot shows the overall report page after the second run of the pipeline, now with a larger gold table and new timestamp / corrID.
+
+![screenshot](./readme-assets/remote_data_management.jpg "Remote Data Management")  
+Azure remote pipeline's data management paged accessed through a web browser.  
+
+![screenshot](./readme-assets/report_page_after_second_run.jpg "Report Page")  
+Pipeline report page after a second run  
+  
+The following screenshot shows the logs of the extractor service running on the remote virtual machine. The output shows no difference in how the local and remote virtual machines run the pipeline. The final output of the logs details the sending of a transform job to RabbitMQ, expected behavior with no errors.  
+
+![screenshot](./readme-assets/comparing_remote_logs.jpg "Remote Extractor Logs")  
+Extractor logs on the remote virtual machine.  
