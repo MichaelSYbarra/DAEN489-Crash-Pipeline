@@ -74,7 +74,7 @@ jobs:
         # Start MinIO service for Go extractor
         - name: "Start MinIO service"
           run: |
-            docker compose -f docker-compose.yml up -d minio
+            docker compose -f docker-compose.yaml up -d minio
 
         # Wait for MinIO to be ready
         - name: "Wait for MinIO readiness"
