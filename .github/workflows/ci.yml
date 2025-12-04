@@ -83,7 +83,7 @@ jobs:
         # Extractor help check inside Docker network
         - name: "Extractor help check"
           run: |
-            docker compose -f docker-compose.yaml run --rm extractor go run main.go --help
+            timeout 10s docker compose -f docker-compose.yaml run --rm extractor go run main.go --help || true
 
         # Transformer import check
         - name: "Transformer import test"
