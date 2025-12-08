@@ -188,4 +188,4 @@ The following screenshot shows the logs of the extractor service running on the 
 ![screenshot](./readme-assets/comparing_remote_logs.jpg "Remote Extractor Logs")  
 Extractor logs on the remote virtual machine.  
 
-Safe Edit
+Safe Edit 2
